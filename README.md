@@ -1,1 +1,1 @@
-# LIRI-Bot-App
+# TEMPLATE FOR WEBSITES - created by Nathaniel Spry
