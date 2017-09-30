@@ -33,7 +33,7 @@ function myTweets() { // This will show your last 20 tweets and when they were c
 				console.log("--------------------");
 			}
 		}
-	})
+	});
 };
 
 function spotifySong(songName) { // This will display the information of the song that user inputs, Artist, Song Name, Preview Link, Album. If no song is provided then your program defaults to "The Sign" by Ace of Base
@@ -49,11 +49,23 @@ function spotifySong(songName) { // This will display the information of the son
 		console.log("\nSong Name: " + data.tracks.items[0].name);
 		console.log("\nArtist: " + data.tracks.items[0].artists[0].name);
 		console.log("\nAlbum: " + data.tracks.items[0].album.name);
-		console.log("\nPreview Link: " + data.tracks.href);
+		console.log("\nPreview Link: " + data.tracks.items[0].preview_url);
 		console.log("\n-----------------------");
+
+		fs.appendFile("../log.txt",
+			"\nSong Name: " + data.tracks.items[0].name +
+			"\nArtist: " + data.tracks.items[0].artists[0].name +
+			"\nAlbum: " + data.tracks.items[0].album.name +
+			"\nPreview Link: " + data.tracks.items[0].preview_url +
+			"\n-----------------------",
+		function(err) {
+			if (err) {
+				return console.log(err);
+			}
+		})
 	}).catch(function(err) {
 		return console.log('Error occurred: ' + err);
-	})
+	});
 };
 
 function movie(movieName) { // This will display the information of the movie that user inputs, Title, Year, IMDB Rating, Rotten Tomatoes Rating, Country of production, Language, Plot, Actors.
@@ -76,6 +88,22 @@ function movie(movieName) { // This will display the information of the movie th
 		} else {
 			return console.log(err);
 		}
+
+		fs.appendFile("../log.txt",
+			"\nMovie Title: " + JSON.parse(body).Title +
+			"\nReleased: " + JSON.parse(body).Released +
+			"\n IMDB Rating: " + JSON.parse(body).Ratings[0].Value +
+			"\n Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value +
+			"\n Country Produced In: " + JSON.parse(body).Country +
+			"\n Language(s): " + JSON.parse(body).Language +
+			"\n Plot: " + JSON.parse(body).Plot +
+			"\n Actors: " + JSON.parse(body).Actors +
+			"\n-----------------------",
+		function(err) {
+			if (err) {
+				return console.log(err);
+			}
+		})
 	});
 };
 
@@ -95,7 +123,7 @@ function directions() { // This will read commands from a text document and exec
 				movie(commandArray[i].split(",")[1]);
 			}
 		}
-	})
+	});
 };
 
 var arg = process.argv[2];
@@ -116,7 +144,3 @@ switch (arg) {
 	directions();
 	break;
 }
-// ### BONUS
-// * In addition to logging the data to your terminal/bash window, output the data to a .txt file called `log.txt`.
-// * Make sure you append each command you run to the `log.txt` file. 
-// * Do not overwrite your file each time you run a command.
