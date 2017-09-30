@@ -1,6 +1,7 @@
 var request = require("request");
 var Twitter = require("twitter");
 var Spotify = require("node-spotify-api");
+var fs = require("fs");
 var keys = require("./keys.js");
 var twitter = new Twitter({
 	consumer_key: keys.twitterKeys.consumer_key,
@@ -35,8 +36,8 @@ function myTweets() { // This will show your last 20 tweets and when they were c
 	})
 };
 
-function spotifySong() { // This will display the information of the song that user inputs, Artist, Song Name, Preview Link, Album. If no song is provided then your program defaults to "The Sign" by Ace of Base
-	var songName = process.argv.slice(3).join(" ");
+function spotifySong(songName) { // This will display the information of the song that user inputs, Artist, Song Name, Preview Link, Album. If no song is provided then your program defaults to "The Sign" by Ace of Base
+	songName = songName || process.argv.slice(3).join(" ");
 	if (songName === "") {
 		songName = "The Sign";
 	}
@@ -49,13 +50,53 @@ function spotifySong() { // This will display the information of the song that u
 		console.log("\nArtist: " + data.tracks.items[0].artists[0].name);
 		console.log("\nAlbum: " + data.tracks.items[0].album.name);
 		console.log("\nPreview Link: " + data.tracks.href);
+		console.log("\n-----------------------");
 	}).catch(function(err) {
 		return console.log('Error occurred: ' + err);
 	})
 };
 
-function movie() {};
-function directions() {};
+function movie(movieName) { // This will display the information of the movie that user inputs, Title, Year, IMDB Rating, Rotten Tomatoes Rating, Country of production, Language, Plot, Actors.
+	movieName = movieName || process.argv.slice(3).join(" ");
+	if (movieName === "") {
+		movieName = "Mr. Nobody";
+	}
+
+	request('http://www.omdbapi.com/?apikey=40e9cece&t=' + movieName, function (err, response, body) {
+		if (!err && response.statusCode === 200) {
+			console.log("\nMovie Title: " + JSON.parse(body).Title);
+			console.log("\nReleased: " + JSON.parse(body).Released);
+			console.log("\n IMDB Rating: " + JSON.parse(body).Ratings[0].Value);
+			console.log("\n Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value);
+			console.log("\n Country Produced In: " + JSON.parse(body).Country);
+			console.log("\n Language(s): " + JSON.parse(body).Language);
+			console.log("\n Plot: " + JSON.parse(body).Plot);
+			console.log("\n Actors: " + JSON.parse(body).Actors);
+			console.log("\n-----------------------");
+		} else {
+			return console.log(err);
+		}
+	});
+};
+
+function directions() { // This will read commands from a text document and executes functions based on it
+	fs.readFile("../commands.txt", "utf8", function(err, data) {
+		if (err) {
+			return console.log(err);
+		}
+
+		commandArray = data.split("\r\n");
+		// console.log(commandArray);
+		for (var i = 0; i < commandArray.length; i++) {
+			if (commandArray[i].split(",")[0] === "spotify-this-song") {
+				spotifySong(commandArray[i].split(",")[1]);
+			}
+			if (commandArray[i].split(",")[0] === "movie-this") {
+				movie(commandArray[i].split(",")[1]);
+			}
+		}
+	})
+};
 
 var arg = process.argv[2];
 switch (arg) {
@@ -68,10 +109,14 @@ switch (arg) {
 	break;
 
 	case "movie-this":
-	withdraw();
+	movie();
 	break;
 
 	case "do-what-it-says":
-	lotto();
+	directions();
 	break;
 }
+// ### BONUS
+// * In addition to logging the data to your terminal/bash window, output the data to a .txt file called `log.txt`.
+// * Make sure you append each command you run to the `log.txt` file. 
+// * Do not overwrite your file each time you run a command.
