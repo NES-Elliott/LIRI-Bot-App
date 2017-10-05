@@ -126,6 +126,14 @@ function directions() { // This will read commands from a text document and exec
 	});
 };
 
+function help() { // Help command if the user doesn't know what the valid inputs are.
+	console.log("\nThe available commands are:" + 
+		"\n'my-tweets' to see your last 20 tweets" + 
+		"\n'spotify-this-song' to get spotify info on a song of your choice" + 
+		"\n'movie-this' to get OMDB info on a movie of your choice" + 
+		"\n'do-what-it-says' to input commands via text file");
+}
+
 var arg = process.argv[2];
 switch (arg) {
 	case "my-tweets":
@@ -142,5 +150,9 @@ switch (arg) {
 
 	case "do-what-it-says":
 	directions();
+	break;
+
+	case "help":
+	help();
 	break;
 }
